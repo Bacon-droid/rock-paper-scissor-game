@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --panel: #151d33;
+  --panel-light: #1d2944;
+  --text: #f4f7ff;
+  --muted: #9aa8c4;
+  --accent: #8b7cff;
+  --accent-2: #45d6c5;
+  --border: rgba(255,255,255,.09);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; padding: 32px 16px;
+  display: grid; place-items: center;
+  background: radial-gradient(ellipse at 50% 0%, #202951 0%, var(--bg) 58%);
+  color: var(--text); font-family: 'DM Sans', sans-serif;
+}
+.game {
+  width: min(100%, 720px); padding: clamp(22px, 5vw, 48px);
+  border: 1px solid var(--border); border-radius: 28px;
+  background: rgba(18, 26, 46, .92);
+  box-shadow: 0 28px 90px rgba(0,0,0,.42);
+}
+.header { text-align: center; }
+.eyebrow, .section-label {
+  color: var(--accent-2); font-size: .72rem; font-weight: 800;
+  letter-spacing: .19em; margin: 0 0 12px;
+}
+h1 {
+  font: 700 clamp(2rem, 6vw, 3.25rem)/1.1 'Space Grotesk', sans-serif;
+  letter-spacing: -.055em; margin: 0;
+}
+h1 span { color: var(--accent-2); }
+.subtitle { color: var(--muted); margin: 13px 0 0; }
+.scoreboard {
+  display: flex; justify-content: center; align-items: center; gap: 36px;
+  margin: 34px auto 28px; padding: 18px 28px; width: fit-content;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+}
+.score { min-width: 82px; display: grid; justify-items: center; gap: 3px; }
+.score-label { color: var(--muted); font-size: .68rem; font-weight: 800; letter-spacing: .13em; }
+.score strong { font: 700 2.1rem 'Space Grotesk', sans-serif; }
+.score-divider { color: #52617f; font-weight: 700; font-size: 1.4rem; }
+.arena {
+  display: flex; align-items: center; justify-content: center; gap: clamp(14px, 5vw, 48px);
+  padding: 26px 12px; background: linear-gradient(135deg, rgba(139,124,255,.09), rgba(69,214,197,.06));
+  border: 1px solid var(--border); border-radius: 22px;
+}
+.choice-display { display: grid; justify-items: center; gap: 8px; min-width: 105px; }
+.player-tag { color: var(--muted); font-size: .7rem; font-weight: 800; letter-spacing: .14em; }
+.hand { font-size: clamp(3.3rem, 10vw, 5.2rem); line-height: 1.25; filter: drop-shadow(0 8px 14px rgba(0,0,0,.2)); }
+.choice-name { color: var(--muted); font-size: .88rem; text-transform: capitalize; }
+.versus { color: var(--accent); font: 700 1rem 'Space Grotesk', sans-serif; }
+.result-panel { text-align: center; min-height: 94px; padding: 22px 8px 10px; }
+.result-panel h2 { font: 700 1.5rem 'Space Grotesk', sans-serif; margin: 0 0 6px; }
+.result-panel p { color: var(--muted); margin: 0; font-size: .92rem; }
+.result-panel.win h2 { color: var(--accent-2); }
+.result-panel.lose h2 { color: #ff8294; }
+.result-panel.tie h2 { color: #ffd479; }
+.controls { text-align: center; margin-top: 12px; }
+.choices { display: flex; justify-content: center; gap: 13px; }
+.choice-button {
+  flex: 1; max-width: 160px; min-height: 112px; display: grid; place-content: center; gap: 7px;
+  border: 1px solid var(--border); border-radius: 17px; background: var(--panel);
+  color: var(--text); font: 700 .9rem 'DM Sans', sans-serif; cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.choice-button:hover { transform: translateY(-5px); border-color: var(--accent); background: var(--panel-light); }
+.choice-button:active { transform: translateY(-1px) scale(.98); }
+.choice-emoji { font-size: 2.25rem; }
+.reset-button {
+  margin-top: 22px; padding: 10px 17px; border: 1px solid var(--border);
+  border-radius: 999px; color: var(--muted); background: transparent;
+  font: 600 .84rem 'DM Sans', sans-serif; cursor: pointer;
+}
+.reset-button:hover { color: var(--text); border-color: var(--accent-2); }
+footer { margin-top: 27px; text-align: center; color: #687895; font-size: .78rem; }
+button:focus-visible { outline: 3px solid var(--accent-2); outline-offset: 3px; }
+@media (max-width: 480px) {
+  body { padding: 14px 10px; }
+  .game { border-radius: 21px; padding: 24px 16px; }
+  .scoreboard { margin: 25px auto 20px; }
+  .arena { gap: 8px; padding: 20px 5px; }
+  .choice-display { min-width: 90px; }
+  .choices { gap: 8px; }
+  .choice-button { min-height: 100px; font-size: .82rem; }
+  .choice-emoji { font-size: 1.9rem; }
+}
