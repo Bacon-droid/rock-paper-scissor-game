@@ -141,7 +141,7 @@
     <footer>Good luck, and have fun!</footer>
   </main>
 
-  <!-- Loss popup with the requested laughing cat GIF -->
+  <!-- Loss popup with local GIF -->
   <div class="loss-popup" id="lossPopup" role="dialog" aria-modal="true" aria-labelledby="lossPopupTitle">
     <div class="loss-popup__content">
       <h2 class="loss-popup__title" id="lossPopupTitle">💻 Computer wins!</h2>
@@ -149,7 +149,7 @@
       <img
         class="loss-popup__gif"
         id="lossGif"
-        src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        src="laughing-cat.gif"
         alt="Laughing cat pointing meme"
         width="280"
         height="280"
@@ -164,17 +164,10 @@
     (function() {
       const lossPopup = document.getElementById('lossPopup');
       const lossPopupMessage = document.getElementById('lossPopupMessage');
-      const lossGif = document.getElementById('lossGif');
       const closeBtn = document.getElementById('closeLossPopup');
 
       const resultPanel = document.querySelector('.result-panel');
       const resultMessage = document.getElementById('result-message');
-
-      // The specific GIF you provided, embedded as Base64 so it never breaks
-      const CAT_GIF_SRC = "data:image/gif;base64,R0lGODlhKAAoAPcAAP////7+/v39/fz8/Pv7+/r6+vn5+fj4+Pf39/b29vX19fT09PPz8/Ly8vHx8fDw8O/v7+7u7u3t7ezs7Ovr6+rq6unp6ejo6Ofn5+bm5uXl5eTk5OPj4+Li4uHh4eDg4N/f397e3t3d3dzc3Nvb29ra2tnZ2djY2NfX19bW1tXV1dTU1NPT09LS0tHR0dDQ0M/Pz87Ozs3NzczMzMvLy8rKysnJycjIyMfHx8bGxsXFxcTExMPDw8LCwsHBwcDAwL+/v76+vr29vby8vLu7u7q6urm5ubi4uLe3t7a2trW1tbS0tLOzs7KysrGxsbCwsK+vr66urq2traysrKurq6qqqqmpqaioqKenp6ampqWlpaSkpKOjo6KioqGhoaCgoJ+fn56enp2dnZycnJubm5qampmZmZiYmJeXl5aWlpWVlZSUlJOTk5KSkpGRkZCQkI+Pj46Ojo2NjYyMjIuLi4qKiomJiYiIiIeHh4aGhoWFhYSEhIODg4KCgoGBgYCAgH9/f35+fn19fXx8fHt7e3p6enl5eXh4eHd3d3Z2dnV1dXR0dHNzc3JycnFxcXBwcG9vb25ubm1tbWxsbGtra2pqamlpaWhoaGdnZ2ZmZmVlZWRkZGNjY2JiYmFhYWBgYF9fX15eXl1dXVxcXFtbW1paWllZWVhYWFdXV1ZWVlVVVVRUVFNTU1JSUlFRUVBQUE9PT05OTk1NTUxMTEtLS0pKSklJSUhISEdHR0ZGRkVFRURERENDQ0JCQkFBQUBAQD8/Pz4+Pj09PTw8PDs7Ozo6Ojk5OTg4ODc3NzY2NjU1NTQ0NDMzMzIyMjExMTAwMC8vLy4uLi0tLSwsLCsrKyoqKikpKSgoKCcnJyYmJiUlJSQkJCMjIyIiIiEhISAgIB8fHx4eHh0dHRwcHBsbGxoaGhkZGRgYGBcXFxYWFhUVFRQUFBMTExISEhERERAQEA8PDw4ODg0NDQwMDAsLCwoKCgkJCQgICAcHBwYGBgUFBQQEBAMDAwICAgEBAQAAACwAAAAAKAAoAAAI/gABCBxIsKDBgwgTKlzIsKHDhxAjSpxIsaLFixgzatzIsaPHjyBDihxJsqTJkyhTqlzJsqXLlzBjypxJs6bNmzhz6tzJs6fPn0CDCh1KtKjRo0iTKl3KtKnTp1CjSp1KtarVq1izat3KtavXr2DDih1LtqzZs2jTql3Ltq3bt3Djyp1Lt67du3jz6t3Lt6/fv4ADCx5MuLDhw4gTK17MuLHjx5AjS55MubLly5gza97MubPnz6BDix5NurTp06hTq17NurXr17Bjy55Nu7bt27hz697Nu7fv38CDCx9OvLjx48iTK1/OvLnz59CjS59Ovbr169iza9/Ovbv37+DDi5c8T768+fPo06tfz769+/fw48ufT7++/fv48+vfz7+/////CRRAAA7";
-      
-      // Set the GIF source
-      lossGif.src = CAT_GIF_SRC;
 
       function showLossPopup(playerMoveLabel, computerMoveLabel) {
         lossPopupMessage.textContent = `${computerMoveLabel} beats ${playerMoveLabel}. Computer takes this round!`;
@@ -188,12 +181,14 @@
 
       closeBtn.addEventListener('click', closeLossPopup);
 
+      // Close when clicking outside the popup content
       lossPopup.addEventListener('click', function(e) {
         if (e.target === lossPopup) {
           closeLossPopup();
         }
       });
 
+      // Close with Escape key
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && lossPopup.classList.contains('show')) {
           closeLossPopup();
@@ -222,6 +217,7 @@
 
       observer.observe(resultPanel, { attributes: true, attributeFilter: ['class'] });
 
+      // Ensure popup closes if reset is clicked
       const resetButton = document.getElementById('reset-button');
       if (resetButton) {
         resetButton.addEventListener('click', closeLossPopup);
