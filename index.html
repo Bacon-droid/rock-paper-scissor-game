@@ -7,8 +7,8 @@
   <title>Rock Paper Scissors</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Loss popup styles */
-    .loss-popup {
+    /* Shared popup styles */
+    .popup {
       position: fixed;
       inset: 0;
       display: flex;
@@ -21,13 +21,12 @@
       pointer-events: none;
       transition: opacity 0.25s ease;
     }
-    .loss-popup.show {
+    .popup.show {
       opacity: 1;
       pointer-events: auto;
     }
-    .loss-popup__content {
+    .popup__content {
       background: linear-gradient(145deg, #1a2238, #121a30);
-      border: 1px solid rgba(255, 130, 148, 0.35);
       border-radius: 28px;
       padding: 28px 28px 24px;
       max-width: 420px;
@@ -37,22 +36,36 @@
       transform: scale(0.9);
       transition: transform 0.25s ease;
     }
-    .loss-popup.show .loss-popup__content {
+    .popup.show .popup__content {
       transform: scale(1);
     }
-    .loss-popup__title {
+    
+    /* Specific colors for win/loss */
+    .popup--win .popup__content {
+      border: 1px solid rgba(69, 214, 197, 0.35);
+    }
+    .popup--win .popup__title {
+      color: #45d6c5;
+    }
+    .popup--loss .popup__content {
+      border: 1px solid rgba(255, 130, 148, 0.35);
+    }
+    .popup--loss .popup__title {
+      color: #ff8294;
+    }
+
+    .popup__title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.6rem;
       font-weight: 700;
-      color: #ff8294;
       margin: 0 0 6px;
     }
-    .loss-popup__subtitle {
+    .popup__subtitle {
       color: #9aa8c4;
       font-size: 0.9rem;
       margin: 0 0 14px;
     }
-    .loss-popup__gif {
+    .popup__gif {
       width: 100%;
       max-width: 280px;
       border-radius: 18px;
@@ -63,8 +76,7 @@
       aspect-ratio: 1 / 1;
       object-fit: cover;
     }
-    .loss-popup__close {
-      border: 1px solid rgba(255, 130, 148, 0.4);
+    .popup__close {
       background: transparent;
       color: #f4f7ff;
       font: 600 0.85rem 'DM Sans', sans-serif;
@@ -73,11 +85,21 @@
       cursor: pointer;
       transition: background 0.2s, border-color 0.2s;
     }
-    .loss-popup__close:hover {
+    .popup--win .popup__close {
+      border: 1px solid rgba(69, 214, 197, 0.4);
+    }
+    .popup--win .popup__close:hover {
+      background: rgba(69, 214, 197, 0.12);
+      border-color: #45d6c5;
+    }
+    .popup--loss .popup__close {
+      border: 1px solid rgba(255, 130, 148, 0.4);
+    }
+    .popup--loss .popup__close:hover {
       background: rgba(255, 130, 148, 0.12);
       border-color: #ff8294;
     }
-    .loss-popup__close:focus-visible {
+    .popup__close:focus-visible {
       outline: 3px solid #45d6c5;
       outline-offset: 3px;
     }
@@ -141,20 +163,35 @@
     <footer>Good luck, and have fun!</footer>
   </main>
 
-  <!-- Loss popup with local GIF -->
-  <div class="loss-popup" id="lossPopup" role="dialog" aria-modal="true" aria-labelledby="lossPopupTitle">
-    <div class="loss-popup__content">
-      <h2 class="loss-popup__title" id="lossPopupTitle">💻 Computer wins!</h2>
-      <p class="loss-popup__subtitle" id="lossPopupMessage">You lost this round.</p>
+  <!-- Win Popup -->
+  <div class="popup popup--win" id="winPopup" role="dialog" aria-modal="true" aria-labelledby="winPopupTitle">
+    <div class="popup__content">
+      <h2 class="popup__title" id="winPopupTitle">🎉 You win!</h2>
+      <p class="popup__subtitle" id="winPopupMessage">Great move!</p>
       <img
-        class="loss-popup__gif"
-        id="lossGif"
+        class="popup__gif"
+        src="win.gif"
+        alt="Celebration GIF"
+        width="280"
+        height="280"
+      >
+      <button class="popup__close" id="closeWinPopup" type="button">Keep playing 🚀</button>
+    </div>
+  </div>
+
+  <!-- Loss Popup -->
+  <div class="popup popup--loss" id="lossPopup" role="dialog" aria-modal="true" aria-labelledby="lossPopupTitle">
+    <div class="popup__content">
+      <h2 class="popup__title" id="lossPopupTitle">💻 Computer wins!</h2>
+      <p class="popup__subtitle" id="lossPopupMessage">You lost this round.</p>
+      <img
+        class="popup__gif"
         src="laughing-cat.gif"
         alt="Laughing cat pointing meme"
         width="280"
         height="280"
       >
-      <button class="loss-popup__close" id="closeLossPopup" type="button">Try again 💪</button>
+      <button class="popup__close" id="closeLossPopup" type="button">Try again 💪</button>
     </div>
   </div>
 
@@ -162,65 +199,101 @@
   <script>
     // --- Popup logic & Game Integration ---
     (function() {
+      const winPopup = document.getElementById('winPopup');
+      const winPopupMessage = document.getElementById('winPopupMessage');
+      const closeWinBtn = document.getElementById('closeWinPopup');
+
       const lossPopup = document.getElementById('lossPopup');
       const lossPopupMessage = document.getElementById('lossPopupMessage');
-      const closeBtn = document.getElementById('closeLossPopup');
+      const closeLossBtn = document.getElementById('closeLossPopup');
 
       const resultPanel = document.querySelector('.result-panel');
       const resultMessage = document.getElementById('result-message');
 
+      function showWinPopup(playerMoveLabel, computerMoveLabel) {
+        winPopupMessage.textContent = `${playerMoveLabel} beats ${computerMoveLabel}. Nice one!`;
+        winPopup.classList.add('show');
+        closeWinBtn.focus();
+      }
+
+      function closeWinPopup() {
+        winPopup.classList.remove('show');
+      }
+
       function showLossPopup(playerMoveLabel, computerMoveLabel) {
         lossPopupMessage.textContent = `${computerMoveLabel} beats ${playerMoveLabel}. Computer takes this round!`;
         lossPopup.classList.add('show');
-        closeBtn.focus();
+        closeLossBtn.focus();
       }
 
       function closeLossPopup() {
         lossPopup.classList.remove('show');
       }
 
-      closeBtn.addEventListener('click', closeLossPopup);
+      // Close buttons
+      closeWinBtn.addEventListener('click', closeWinPopup);
+      closeLossBtn.addEventListener('click', closeLossPopup);
 
-      // Close when clicking outside the popup content
+      // Click outside to close
+      winPopup.addEventListener('click', function(e) {
+        if (e.target === winPopup) closeWinPopup();
+      });
       lossPopup.addEventListener('click', function(e) {
-        if (e.target === lossPopup) {
-          closeLossPopup();
-        }
+        if (e.target === lossPopup) closeLossPopup();
       });
 
-      // Close with Escape key
+      // Escape key to close
       document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && lossPopup.classList.contains('show')) {
-          closeLossPopup();
+        if (e.key === 'Escape') {
+          if (winPopup.classList.contains('show')) closeWinPopup();
+          if (lossPopup.classList.contains('show')) closeLossPopup();
         }
       });
 
-      // Observe the result panel to trigger the popup on loss
+      // Observe the result panel to trigger the popups
       const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
           if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            
+            // Check for Win
+            if (resultPanel.classList.contains('win')) {
+              const msg = resultMessage.textContent;
+              const match = msg.match(/^(.+?) beats (.+?)\.$/);
+              let playerMoveLabel = 'your move';
+              let computerMoveLabel = 'Computer move';
+              if (match) {
+                playerMoveLabel = match[1].trim();
+                computerMoveLabel = match[2].trim();
+              }
+              showWinPopup(playerMoveLabel, computerMoveLabel);
+            }
+
+            // Check for Loss
             if (resultPanel.classList.contains('lose')) {
               const msg = resultMessage.textContent;
               const match = msg.match(/^(.+?) beats (.+?)\.$/);
               let playerMoveLabel = 'your move';
               let computerMoveLabel = 'Computer move';
-              
               if (match) {
                 computerMoveLabel = match[1].trim();
                 playerMoveLabel = match[2].trim();
               }
               showLossPopup(playerMoveLabel, computerMoveLabel);
             }
+
           }
         });
       });
 
       observer.observe(resultPanel, { attributes: true, attributeFilter: ['class'] });
 
-      // Ensure popup closes if reset is clicked
+      // Ensure popups close if reset is clicked
       const resetButton = document.getElementById('reset-button');
       if (resetButton) {
-        resetButton.addEventListener('click', closeLossPopup);
+        resetButton.addEventListener('click', function() {
+          closeWinPopup();
+          closeLossPopup();
+        });
       }
     })();
   </script>
