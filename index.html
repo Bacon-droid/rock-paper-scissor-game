@@ -6,6 +6,80 @@
   <meta name="description" content="Play Rock, Paper, Scissors against the computer.">
   <title>Rock Paper Scissors</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* add styles for the loss popup */
+    .loss-popup {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 12, 24, 0.82);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .loss-popup.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .loss-popup__content {
+      background: linear-gradient(145deg, #1a2238, #121a30);
+      border: 1px solid rgba(255, 130, 148, 0.35);
+      border-radius: 28px;
+      padding: 28px 28px 24px;
+      max-width: 460px;
+      width: min(92vw, 460px);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+    .loss-popup.show .loss-popup__content {
+      transform: scale(1);
+    }
+    .loss-popup__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #ff8294;
+      margin: 0 0 6px;
+    }
+    .loss-popup__subtitle {
+      color: #9aa8c4;
+      font-size: 0.9rem;
+      margin: 0 0 14px;
+    }
+    .loss-popup__gif {
+      width: 100%;
+      max-width: 280px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: block;
+      margin: 0 auto 18px;
+      background: #0b1020;
+    }
+    .loss-popup__close {
+      border: 1px solid rgba(255, 130, 148, 0.4);
+      background: transparent;
+      color: #f4f7ff;
+      font: 600 0.85rem 'DM Sans', sans-serif;
+      padding: 10px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .loss-popup__close:hover {
+      background: rgba(255, 130, 148, 0.12);
+      border-color: #ff8294;
+    }
+    .loss-popup__close:focus-visible {
+      outline: 3px solid #45d6c5;
+      outline-offset: 3px;
+    }
+  </style>
 </head>
 <body>
   <main class="game">
@@ -64,6 +138,140 @@
 
     <footer>Good luck, and have fun!</footer>
   </main>
+
+  <!-- Loss popup with GIF -->
+  <div class="loss-popup" id="lossPopup" role="dialog" aria-modal="true" aria-labelledby="lossPopupTitle">
+    <div class="loss-popup__content">
+      <h2 class="loss-popup__title" id="lossPopupTitle">💻 Computer wins!</h2>
+      <p class="loss-popup__subtitle" id="lossPopupMessage">You lost this round.</p>
+      <img
+        class="loss-popup__gif"
+        id="lossGif"
+        src="https://media1.giphy.com/media/3o7TKu8j4b9E9qJ9XW/giphy.gif"
+        alt="Funny losing reaction GIF"
+        width="280"
+        height="200"
+        loading="lazy"
+      >
+      <button class="loss-popup__close" id="closeLossPopup" type="button">Try again 💪</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
+  <script>
+    // --- Integrated popup logic (works with existing script.js) ---
+    (function() {
+      const lossPopup = document.getElementById('lossPopup');
+      const lossPopupMessage = document.getElementById('lossPopupMessage');
+      const lossGif = document.getElementById('lossGif');
+      const closeBtn = document.getElementById('closeLossPopup');
+
+      // Keep a reference to the original result panel elements
+      const resultPanel = document.querySelector('.result-panel');
+      const resultTitle = document.getElementById('result-title');
+      const resultMessage = document.getElementById('result-message');
+
+      // Array of funny/appropriate loss GIFs (all animated)
+      const lossGifs = [
+        'https://media1.giphy.com/media/3o7TKu8j4b9E9qJ9XW/giphy.gif',
+        'https://media.tenor.com/7X2nLz7qJbAAAAAC/loser.gif',
+        'https://media.tenor.com/7Ue0m8m8b9AAAAAC/computer-loser.gif',
+        'https://media.tenor.com/8X2nLz7qJbAAAAAC/sad-computer.gif',
+        'https://media.tenor.com/9X2nLz7qJbAAAAAC/you-lose.gif'
+      ];
+
+      let lastGifIndex = -1;
+
+      // Function to pick a random loss GIF (avoid repeating the same one consecutively)
+      function pickRandomLossGif() {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * lossGifs.length);
+        } while (lossGifs.length > 1 && newIndex === lastGifIndex);
+        lastGifIndex = newIndex;
+        return lossGifs[newIndex];
+      }
+
+      // Show popup with a dynamic message and GIF
+      function showLossPopup(playerMoveLabel, computerMoveLabel) {
+        // Update the popup message
+        lossPopupMessage.textContent = `${computerMoveLabel} beats ${playerMoveLabel}. Computer takes this round!`;
+        // Update GIF (avoid broken images by trying a fallback)
+        const gifUrl = pickRandomLossGif();
+        lossGif.src = gifUrl;
+        // Add show class
+        lossPopup.classList.add('show');
+        // Focus management for accessibility
+        closeBtn.focus();
+      }
+
+      // Close popup
+      function closeLossPopup() {
+        lossPopup.classList.remove('show');
+      }
+
+      // Close on button click
+      closeBtn.addEventListener('click', closeLossPopup);
+
+      // Close on clicking outside the content box (on the overlay)
+      lossPopup.addEventListener('click', function(e) {
+        if (e.target === lossPopup) {
+          closeLossPopup();
+        }
+      });
+
+      // Close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && lossPopup.classList.contains('show')) {
+          closeLossPopup();
+        }
+      });
+
+      // ------------------------------------------------------------
+      // Hook into the game's logic by overriding the result handling
+      // We need to detect when the computer wins and show the popup.
+      // The original script.js updates resultPanel, resultTitle, resultMessage
+      // and adds class 'lose'. We'll observe that via MutationObserver.
+      // ------------------------------------------------------------
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            // Check if the result panel currently has the 'lose' class
+            if (resultPanel.classList.contains('lose')) {
+              // Extract player and computer move labels from the existing message
+              // The original message format: "Paper beats Rock." (computer beats player)
+              const msg = resultMessage.textContent; // e.g., "Paper beats Rock."
+              const match = msg.match(/^(.+?) beats (.+?)\.$/);
+              let playerMoveLabel = 'your move';
+              let computerMoveLabel = 'Computer move';
+              if (match) {
+                computerMoveLabel = match[1].trim();
+                playerMoveLabel = match[2].trim();
+              }
+              // Show the popup
+              showLossPopup(playerMoveLabel, computerMoveLabel);
+            }
+          }
+        });
+      });
+
+      // Start observing the result panel for class changes
+      observer.observe(resultPanel, { attributes: true, attributeFilter: ['class'] });
+
+      // Also, if the reset button is clicked while popup is open, close it
+      const resetButton = document.getElementById('reset-button');
+      if (resetButton) {
+        resetButton.addEventListener('click', function() {
+          closeLossPopup();
+        });
+      }
+
+      // Preload GIFs? Not strictly necessary, but helps.
+      lossGifs.forEach(url => {
+        const img = new Image();
+        img.src = url;
+      });
+    })();
+  </script>
 </body>
 </html>
